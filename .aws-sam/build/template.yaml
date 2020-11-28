@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'sam-sample
+
+  Sample SAM Template for sam-sample
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+  HelloStrFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloStrFunction
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /hello/str
+            Method: GET
+            RequestParameters:
+              method.request.path.str:
+                Required: true
+                Caching: false
+      Environment:
+        Variables:
+          PARAM1: VALUE
+  HelloReqFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloReqFunction
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /hello/req/{req}
+            Method: GET
+            RequestParameters:
+              method.request.path.req: integration.request.path.req
+      Environment:
+        Variables:
+          PARAM1: VALUE
+Outputs:
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunction
+      - Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunctionRole
+      - Arn
